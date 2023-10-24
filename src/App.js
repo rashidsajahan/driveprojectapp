@@ -1,23 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import { useRef } from "react";
 
 function App() {
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async () => {
+    const files = fileInputRef.current.files;
+
+    if (files.length > 0) {
+      const formData = new FormData();
+
+      for (let i = 0; i < files.length; i++) {
+        console.log("files[i]", files[i]);
+        formData.append("files", files[i]);
+        console.log("formData", formData);
+      }
+      console.log("files", files);
+
+      try {
+        console.log("filestry", files);
+        console.log("formDatatry", formData);
+
+        const response = await fetch("http://localhost:5000/upload", {
+          method: "POST",
+          body: formData,
+        });
+        console.log("response", response);
+
+        const data = await response.json();
+        console.log("uploaded files: ", data.files);
+        fileInputRef(null)
+      } catch (error) {
+        console.log("error");
+      }
+    }
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Upload files</h1>
+      <input type="file" multiple ref={fileInputRef} />
+      <button onClick={handleFileUpload}>Upload</button>
     </div>
   );
 }
